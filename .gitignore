@@ -2,3 +2,4 @@
 test.py
 *.json
 *.csv
+__pycache__
