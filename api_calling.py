@@ -2,7 +2,6 @@ import pandas as pd
 import requests
 import os
 from dotenv import load_dotenv
-import json
 
 class OddsApiCaller:
     def __init__(self) -> None:
@@ -27,16 +26,11 @@ class OddsApiCaller:
             }
         )
         
-        if response.status_code == 200:
-            fo = open("odds.json", "w")
-            json.dump(response.json(), fo)
-            fo.close()
-            result = pd.read_json("odds.json")
-        else: 
+        if response.status_code != 200:
             result['error-code'] = response.status_code
             result['error-text'] = response.text
 
-        return response.json()
+        return response.json() 
 
     def remaining_api_usage(self) -> dict:
         result = dict()
@@ -51,14 +45,3 @@ class OddsApiCaller:
             result['error-code'] = response.status_code
             result['error-text'] = response.text
         return result
-
-# only for testing
-def main():
-    x = OddsApiCaller()
-    df = x.get_odds_df()
-    remaining = x.remaining_api_usage()
-    print(f"Remaining: {remaining['remaining']} used: {remaining['used']}")
-
-
-if __name__ == "__main__":
-    main()
