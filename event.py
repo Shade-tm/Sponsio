@@ -1,15 +1,17 @@
 import pandas as pd
 import numpy as np
 from api_calling import OddsApiCaller
+import math
 
 class Event: 
     def __init__(self):
         self.data = pd.read_json('odds.json') # TODO: should be a paramater and the __init__ should receive the data from the main-function 
 
-    def list_of_best_odds(self):
+    def list_of_best_odds(self) -> list:
         all_best_odds = []
         events = self.data['bookmakers']
         for event in events:
+            print(event)
             for count_bookmaker in range(len(event)):
                 num_outcomes = len(event[count_bookmaker]['markets'][0]['outcomes'])
                 best_odds = [[None, None, float('-inf')] for _ in range(num_outcomes)]
@@ -24,13 +26,22 @@ class Event:
             all_best_odds.append(best_odds)
         return all_best_odds
 
-    def calculate_arbitrage_bets(self):
-        pass
+    def find_arbitrage_bets(self) -> list:
+        outcomes = self.list_of_best_odds()
+        arbitrage_bets = []
+        for outcome in outcomes:
+            probability = 0.0
+            for num_outcome in range(len(outcome)):
+                probability = probability + (1.0 / outcome[num_outcome][2])
+            if (probability < 1.0):
+                arbitrage_bets.append(outcome)
+
+        return arbitrage_bets
 
 
 def main():
     x = Event()
-    x.list_of_best_odds()
+    x.find_arbitrage_bets()
 
 if __name__ == '__main__':
     main()
